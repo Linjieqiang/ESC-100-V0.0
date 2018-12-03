@@ -1,0 +1,52 @@
+// -----------------------------------------------------------
+// FILE: ESC_StandardSCI_DataTypeDef.h
+//
+// Description: 
+//
+// -----------------------------------------------------------
+// Release Date: 2018-08-0828;
+// Authour: Steven Liu;
+// -----------------------------------------------------------
+//
+// 1st.macros
+// -----------------------------------------------------------
+// 1.from Host to Slave
+// ...........................................................
+ # define CMD_motor_enable 0x01
+ # define CMD_target_speed 0x02
+ # define CMD_target_duty 0x03
+
+ # define Config_speed_Ki 0x10
+ # define Config_speed_Kp 0x11
+
+// 2.from Slave to Host
+// ...........................................................
+ # define Status_MainStateMachine 0x80
+ # define Status_ControlStateMachine 0x81
+
+ # define FeedBack_iBus 0x91
+ # define FeedBack_current_speed 0x92
+ # define FeedBack_current_duty 0x93
+
+//
+// 2nd.datatypes
+// -----------------------------------------------------------
+// # ifndef _MACRONAME_DATATYPES
+// # define _MACRONAME_DATATYPES
+//   /* define types here */
+// # endif
+
+//
+// 3rd. variables
+// -----------------------------------------------------------
+// # ifndef _MACRONAME_VARIABLES
+// # define _MACRONAME_VARIABLES
+//   /* define variables here */
+// # endif
+
+//
+// 4th.function prototypes
+// -----------------------------------------------------------
+
+// no more.
+// -----------------------------------------------------------/

@@ -1,0 +1,257 @@
+
+//=============================================================================
+// Copyright (C) 2017, Active-Semi International
+//
+// THIS SOFTWARE IS SUBJECT TO A SOURCE CODE LICENSE AGREEMENT WHICH PROVIDES,
+// AMONG OTHER THINGS:  (i) THAT IT CAN BE USED ONLY TO ADAPT THE LICENSEE'S
+// APPLICATION TO PAC PROCESSORS SUPPLIED BY ACTIVE-SEMI INTERNATIONAL;
+// (ii) THAT  IT IS PROVIDED "AS IS" WITHOUT WARRANTY;  (iii) THAT
+// ACTIVE-SEMICONDUCTOR IS NOT LIABLE FOR ANY INDIRECT DAMAGES OR FOR DIRECT
+// DAMAGES EXCEEDING US$1,500;  AND (iv) THAT IT CAN BE DISCLOSED TO AND USED
+// ONLY BY CERTAIN AUTHORIZED PERSONS.
+//
+//=============================================================================
+
+#include "ESC_BLDCM_Hall.h"
+
+# define Phs_I   4
+# define Phs_II  3
+# define Phs_III 2
+# define Phs_IV  1
+# define Phs_V   6
+# define Phs_VI  5
+# define Phs_ERR 0
+
+// Copy "Hall to Mos Array" number that display on GUI here
+//const uint8_t hall_to_mos_state[] = {9,5,1,6,3,4,2,9};
+//uint8_t next_mos_state[8] = {9,2,3,4,5,6,1,9};
+//uint8_t next_mos_state_rev[8] = {9,6,1,2,3,4,5,9};
+//
+   const u8 hall_to_mos_state[] = { Phs_ERR, \
+                                    Phs_VI,  \
+                                    Phs_IV,  \
+                                    Phs_V,   \
+                                    Phs_II,  \
+                                    Phs_I,   \
+                                    Phs_III, \
+                                    Phs_ERR  };
+
+   u8 next_mos_state[7] = { Phs_ERR, \
+                            Phs_I,   \
+                            Phs_V,   \
+                            Phs_VI,  \
+                            Phs_III, \
+                            Phs_II,  \
+                            Phs_IV   };
+
+   u8 next_mos_state_rev[7] = { Phs_ERR, \
+                                Phs_V,   \
+                                Phs_III, \
+                                Phs_IV,  \
+                                Phs_I,   \
+                                Phs_VI,  \
+                                Phs_II   };
+//void pwm_disable(void);
+
+Hall_Sensor bldcm_hall_sensor_m1;
+
+// Hall detect in CL
+uint32_t debug_Array_1[8] = {9,9,9,9,9,9,9,9};
+
+//=============================================================================
+/// @brief  This function store Hall value,in order to display on GUI
+/// @param  None
+/// @return None
+//=============================================================================
+//#if defined(Hall_MODE_ENABLE)||defined(Hall_Detect_IN_BEMF_MODE)
+//PAC5XXX_RAMFUNC void hall_detect_array_display_on_gui(void)
+//{
+//	Hall_Sensor* hall_ptr;
+//	hall_ptr = &bldcm_hall_sensor_m1;
+
+//	hall_ptr->hall_to_mos_state_detect =
+//								10000000 * debug_Array_1[0] +
+//								1000000 * debug_Array_1[1] +
+//								100000 * debug_Array_1[2] +
+//								10000 * debug_Array_1[3] +
+//								1000 * debug_Array_1[4] +
+//								100 * debug_Array_1[5] +
+//								10 * debug_Array_1[6] +
+//								1 * debug_Array_1[7];
+//}
+//#endif
+
+//=============================================================================
+/// @brief  This function study hall,and store
+/// @param  None
+/// @return None
+//=============================================================================
+//#if defined(Hall_MODE_ENABLE)||defined(Hall_Detect_IN_BEMF_MODE)
+//PAC5XXX_RAMFUNC void hall_detect_in_bemf_mode(void)
+//{
+//	BLDC_Controller* motor_ptr;
+//	motor_ptr = &bldc_m1;
+//	Hall_Sensor* hall_ptr;
+//	hall_ptr = &bldc_hall_sensor_m1;
+
+//	hall_ptr->hall_value = HALL_VALUE_GPIO;
+
+//	debug_Array_1[hall_ptr->hall_value] = motor_ptr->sl_current_state;
+//	hall_detect_array_display_on_gui();
+//}
+//#endif
+
+//=============================================================================
+/// @brief  This function get hall value,then commutate
+/// @param  None
+/// @return None
+//=============================================================================
+
+   void ESC_Commutate(u8 phs)
+   {
+     switch(phs)
+     {
+       case Phs_I:
+          Chopper_Phase_I();
+          break;
+       case Phs_II:
+          Chopper_Phase_II();
+          break;
+       case Phs_III:
+          Chopper_Phase_III();
+          break;
+       case Phs_IV:
+          Chopper_Phase_IV();
+          break;
+       case Phs_V:
+          Chopper_Phase_V();
+          break;
+       case Phs_VI:
+          Chopper_Phase_VI();
+          break;
+       default:
+         Chopper_Phase_ZRO(); 
+     }
+   }
+
+
+#if 1 //defined(Hall_MODE_ENABLE)||defined(Hall_BEMF_SWITCH_MODE_ENABLE)
+/*PAC5XXX_RAMFUNC*/ void get_hall_value_and_change_mos_state(void)
+{
+  BLDCM_Controller* motor_ptr;
+  motor_ptr = &bldcm_m1;
+  Hall_Sensor* hall_ptr;
+  hall_ptr = &bldc_hall_sensor_m1;
+
+  hall_ptr->hall_value = Get_Hall();
+// hall_ptr->hall_value = HALL_VALUE_GPIO;
+
+  if((hall_ptr->hall_value == 0)||(hall_ptr->hall_value == 7))
+  {
+    pwm_disable();
+//  motor_ptr->motor_enable_cmd = DISABLE;
+    main_machine_state = STATE_MAIN_STOP_STANDBY;
+    motor_ptr->app_status |= status_hall_error;
+  }
+
+  if(!motor_ptr->reverse_tune_flag)
+  {
+    hall_ptr->sensored_current_state = hall_to_mos_state[hall_ptr->hall_value];
+  }
+  else
+  {
+    hall_ptr->sensored_current_state = hall_to_mos_state[7-hall_ptr->hall_value];
+  }
+
+//	if(control_machine_state == STATE_CONTROL_OL_SWITCH_CL_WAIT)
+//	{
+//		commutate(hall_ptr->sensored_current_state);
+//	}
+
+  if((hall_ptr->sensored_current_state_pre == hall_ptr->sensored_current_state) ||             \
+     (next_mos_state[hall_ptr->sensored_current_state_pre] == hall_ptr->sensored_current_state))
+  {
+    motor_ptr->call_speed_loop_delay_count++;
+
+    ESC_Commutate(hall_ptr->sensored_current_state);
+		
+    if(hall_ptr->sensored_current_state_pre != hall_ptr->sensored_current_state)
+    {			
+//    Do calculation for 8 sample moving average filter used for speed PI
+      motor_ptr->motorspeed = motor_ptr->motorspeed_cntr;
+      motor_ptr->motorspeed_cntr = 0;
+      motor_ptr->motorspeed_sum -= motor_ptr->motorspeed_buffer[motor_ptr->speed_sample_index];
+      motor_ptr->motorspeed_buffer[motor_ptr->speed_sample_index] = motor_ptr->motorspeed;
+      motor_ptr->motorspeed_sum += motor_ptr->motorspeed;
+      motor_ptr->average_speed = motor_ptr->motorspeed_sum >> 3;
+      motor_ptr->app_measured_speed = motor_ptr->average_speed;
+
+//    If we max out array index reset it to 0
+      if (++(motor_ptr->speed_sample_index) >= NUM_SPEED_SAMPLES)
+      motor_ptr->speed_sample_index = 0;
+    }
+    else
+    {
+      motor_ptr->motorspeed_cntr++;
+    } /*if(hall_ptr->sensored_current_state_pre != hall_ptr->sensored_current_state)*/	
+  } /*if((hall_ptr->sensored_current_state_pre == hall_ptr->sensored_current_state) || ...*/
+
+	hall_ptr->sensored_current_state_pre = hall_ptr->sensored_current_state;
+}
+#endif
+
+//=============================================================================
+/// @brief  This function low speed use hall,high speed use bemf
+/// @param  None
+/// @return None
+//=============================================================================
+//#ifdef 	Hall_BEMF_SWITCH_MODE_ENABLE
+//PAC5XXX_RAMFUNC void hall_bemf_switch_mode(void)
+//{
+//	BLDC_Controller* motor_ptr;
+//	motor_ptr = &bldc_m1;
+//	Hall_Sensor* hall_ptr;
+//	hall_ptr = &bldc_hall_sensor_m1;
+//	fix16_t blanking_sample_counts_temp;
+
+//	hall_ptr->hall_bemf_switch_speed = HertzToTicks(bldc_align_go.switch_speed_hz, TIMER_D_FREQ_F16)>>1 ;
+//	switch(hall_bemf_switch_state)
+//	{
+//		case STATE_HALL_STARTUP:
+//			get_hall_value_and_change_mos_state();
+//			if(motor_ptr->app_measured_speed <= (hall_ptr->hall_bemf_switch_speed - HALL_BEMF_SWISH_SPEED_OFFSET))
+//			{
+//				motor_ptr->sl_current_state = hall_ptr->sensored_current_state;
+
+//				PAC5XXX_TIMERD->PRD = TIMERD_TICKS_30DEG_PLL;
+//			    PAC5XXX_TIMERD->CTL.INTEN = 0;
+//				NVIC_EnableIRQ(TimerC_IRQn);
+//				NVIC_EnableIRQ(TimerD_IRQn);
+//				pac5xxx_timer_d_clear_assert();													// Clear timer
+//				pac5xxx_timer_d_clear_deassert();
+//				motor_ptr->sl_next_state = motor_ptr->sl_current_state;
+//				pac5xxx_tile_register_write(ADDR_CFGAIO9, slcomp_mux[motor_ptr->sl_current_state]);		// MODE9[1:0] = 01b (CT Vfilt), OPT9[1:0] = 0bxx (AIO7), POL9 = 0 (act high), MUX[2:0] = n/a
+//				motor_ptr->samplecounter = 0;
+//				motor_ptr->wait_30degree_enable = 1;
+//				motor_ptr->motorspeed_buffer_blanking[0] = motor_ptr->app_measured_speed;
+//				motor_ptr->motorspeed_buffer_blanking[1] = motor_ptr->app_measured_speed;
+//				motor_ptr->speed_sample_index_blanking = 0;
+//				motor_ptr->motorspeed_sum_blanking = motor_ptr->app_measured_speed << 1;
+//				/* Calculate automatic blanking time using motor last two commutation times using moving average filter */
+//				blanking_sample_counts_temp = fix16_mul_new_16_16(RATIO_BW_TIMERC_FREQ_TIMERD_FREQ,(motor_ptr->motorspeed_sum_blanking<<16) );
+//				motor_ptr->blanking_sample_counts = fix16_mul_new_16_16(blanking_sample_counts_temp,motor_ptr->motor_auto_blank_percent ) >> 16;
+
+
+//				bldc_align_go.align_and_go_state = STATE_STARTUP_DONE;
+//				get_zero_cross_point_state = STATE_TIMERC_BLANKING_CYCLE_TIME;
+//				hall_bemf_switch_state = STATE_HALL_SWITCH_TO_BEMF;
+//			}
+//			break;
+//		case STATE_HALL_SWITCH_TO_BEMF:
+//			get_zero_crossing_point();
+//			break;
+//		default:
+//			break;
+//	}
+//}
+//#endif

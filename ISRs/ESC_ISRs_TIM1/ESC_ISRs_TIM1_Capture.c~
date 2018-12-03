@@ -1,0 +1,78 @@
+// -----------------------------------------------------------
+// FILE: ESC_ISRs_TIM1_Capture.c
+//
+// Description: Timer 1 interrupt service routine.
+//
+// -----------------------------------------------------------
+// Release Date: year-month-day;
+// Authour: Name;
+// -----------------------------------------------------------
+//
+// 1st.macros
+// -----------------------------------------------------------
+ # include "ESC_ISRs_TIM8.h"
+
+//
+// 2nd. variables
+// -----------------------------------------------------------
+
+//
+// 3rd.function prototypes
+// -----------------------------------------------------------
+
+//
+// 4th.funcions
+// -----------------------------------------------------------
+
+   Uint16 i = 0;
+   Uint16 phs = 1;
+
+   void TIM8_UP_IRQHandler(void)
+   {
+		 if(++i>19)
+     {
+		   i = 0;
+			 if(++phs>6) phs = 1;
+		 }
+		 
+    switch(phs)
+    {
+		  case 1:			
+			Chopper_Phase_I();
+        break;
+
+      case 2:
+			Chopper_Phase_II();
+        break;
+
+			case 3:
+			Chopper_Phase_III();
+        break;
+			
+			case 4:
+			Chopper_Phase_IV();
+        break;
+			
+			case 5:
+			Chopper_Phase_V();
+        break;
+			
+      case 6:
+			Chopper_Phase_VI();
+        break;
+
+      default:
+			Chopper_Phase_ZRO();
+    }
+
+//	   Chopper_Phase_II();
+		 TIM_SetCompare1(TIM8,500);
+		 TIM_SetCompare2(TIM8,500);
+		 TIM_SetCompare3(TIM8,500);
+		 
+		 TIM_ClearITPendingBit(TIM8, TIM_IT_Update); //clear pending bit.
+	 }
+
+// no more.
+// -----------------------------------------------------------
+

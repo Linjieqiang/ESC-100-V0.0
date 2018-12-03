@@ -1,0 +1,49 @@
+// -----------------------------------------------------------
+// FILE: ESC_ISRs_TIM1.c
+//
+// Description: Timer 1 interrupt service routine.
+//
+// -----------------------------------------------------------
+// Release Date: 2018-09-07;
+// Authour: Name;
+// -----------------------------------------------------------
+//
+// 1st.macros
+// -----------------------------------------------------------
+ # include "ESC_ISRs_TIM1.h"
+
+//
+// 2nd. variables
+// -----------------------------------------------------------
+
+//
+// 3rd.function prototypes
+// -----------------------------------------------------------
+
+//
+// 4th.funcions
+// -----------------------------------------------------------
+// 1.TIM1 capture Interrupt Service Routine (ISR)
+// ...........................................................
+// @ brief ISR for TIM1 capture.
+// @ param None.
+// @ retval None.
+//
+   void TIM1_CC_IRQHandler(void)
+   {
+     if(TIM_GetFlagStatus(TIM1, TIM_FLAG_CC1) == SET)
+     {
+       TIM_ClearFlag(TIM1,TIM_FLAG_CC1);
+       TIM_ClearITPendingBit(TIM1,TIM_IT_CC1);
+     }
+ 
+     if(TIM_GetFlagStatus(TIM1, TIM_FLAG_CC2) == SET)
+     {
+       TIM_ClearFlag(TIM1,TIM_FLAG_CC2);
+       TIM_ClearITPendingBit(TIM1,TIM_IT_CC2);
+     }		 
+   }
+//
+// no more.
+// -----------------------------------------------------------
+

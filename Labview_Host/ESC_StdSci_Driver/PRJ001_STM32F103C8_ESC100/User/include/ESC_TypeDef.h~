@@ -1,0 +1,21 @@
+// -----------------------------------------------------------
+// File: ESC_TypeDef.h 
+//
+// -----------------------------------------------------------
+// Release Date: 2018-08-25;
+// Authour: Steven Liu;
+// -----------------------------------------------------------
+//
+   typedef int             Int16;
+   typedef long            Int32;
+// typedef int             Boole;
+   typedef unsigned int    Uint16;
+   typedef unsigned long   Uint32;
+   typedef float           Float32;
+   typedef long double     Float64;
+	 
+   enum Bool {T = 0x0001, F = 0x0000};
+
+// no more.
+// -----------------------------------------------------------
+
