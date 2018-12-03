@@ -1,0 +1,178 @@
+/**
+  ******************************************************************************
+  * @file    main.c 
+  * @author  MCD Application Team
+  * @version V1.2.2
+  * @date    14-August-2015
+  * @brief   Main program body
+  ******************************************************************************
+  * @attention
+  *
+  * <h2><center>&copy; COPYRIGHT 2015 STMicroelectronics</center></h2>
+  *
+  * Licensed under MCD-ST Liberty SW License Agreement V2, (the "License");
+  * You may not use this file except in compliance with the License.
+  * You may obtain a copy of the License at:
+  *
+  *        http://www.st.com/software_license_agreement_liberty_v2
+  *
+  * Unless required by applicable law or agreed to in writing, software 
+  * distributed under the License is distributed on an "AS IS" BASIS, 
+  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  * See the License for the specific language governing permissions and
+  * limitations under the License.
+  *
+  ******************************************************************************
+  */
+
+/* Includes ------------------------------------------------------------------*/
+   #include "ESC_Device.h"
+   #include "sys.h"
+   #include "nvic.h"
+   #include "delay.h"
+   #include "usart.h"
+   #include "timer.h"
+	 #include "hall.h"
+	 
+   #include "ESC_StandardSCI_Communication.h"
+   # include "ESC_StandardSCI_DataTypeDef.h"
+
+   #include "ESC_Chopper.h"
+  
+   #include "ESC_ISRs_TIM1.h"
+
+   #include "ESC_BLDCM_Config.h"
+
+/** @addtogroup STM32F30x_StdPeriph_Templates
+  * @{
+  */
+
+/* Private typedef -----------------------------------------------------------*/
+/* Private define ------------------------------------------------------------*/
+/* Private macro -------------------------------------------------------------*/
+/* Private variables ---------------------------------------------------------*/
+/* Private function prototypes -----------------------------------------------*/
+/* Private functions ---------------------------------------------------------*/
+
+/**
+  * @brief  Main program.
+  * @param  None
+  * @retval None
+  */
+	
+//u16 phs = 1;
+ u16 temp_data;
+
+// Motor_Align_Go               bldcm_align_go;
+   BLDCM_Controller             bldcm_m1;
+   eBLDCM_Main_Machine_State    main_machine_state;
+   eSub_Control_Machine_State   control_machine_state;
+// eGet_Zero_Cross_Point_State  get_zero_cross_point_state;
+// eHall_Bemf_Switch_State      hall_bemf_switch_state;
+
+int main(void)
+{
+  BLDCM_Controller* motor_ptr;
+  motor_ptr = &bldcm_m1;
+
+//  u16 i=0;
+  u16 j=0;
+	
+  RCC_Configuration();         //时钟设置
+	
+  USART1_Init(115200);  //串口初始化(115200波特率，接收中断禁止)	
+  InitVrbls_StdSci();          //变量初始化StdSci
+
+  Hall_Sink_Init();
+	
+  Timer1_CAP_Sink_Init(ARR_PWM_CAP,PSC_PWM_CAP, TIM_CounterMode_Up,TIM_ICPolarity_Falling);
+//  Timer2_PWM_Drive_Init(4095,0, TIM_CounterMode_Up, TIM_OCPolarity_High);
+  Timer2_PWM_Drive_Init(ARR_PWM_DAC,PSC_PWM_DAC, TIM_CounterMode_Up, TIM_OCPolarity_High);
+  Timer8_PWM_Drive_Init(1799,0,TIM_CounterMode_CenterAligned1,TIM_OCPolarity_High,TIM_OCNPolarity_High,0x8F);
+
+
+// Configure NVIC priority group:	4 pre-emption priorities, 4 subpriorities.
+  NVIC_PriorityGroupConfig(NVIC_PriorityGroup_2);
+
+// interrupt
+  NVIC_Configuration_USART1();
+	NVIC_Configuration_TIM8_Update();
+  NVIC_Configuration_TIM1_Capture();
+//NVIC_Configuration_SysTick();
+
+  USART_ITConfig(USART1, USART_IT_RXNE, ENABLE); // Enable USART1 RX interrupt.
+  TIM_ITConfig(TIM8, TIM_IT_Update, ENABLE); // Enable Timer 8 update interrupt.
+  TIM_ITConfig(TIM1, TIM_IT_CC1, ENABLE); // 
+  TIM_ITConfig(TIM1, TIM_IT_CC2, ENABLE); //
+
+  SysTick_Config(72000);     //System tick configuration(1ms)
+
+  while(1)
+  {	
+//    for(i=0;i<0xFF;i++)
+//    {			
+//      if(ESC_StdSci_Receive(i, &temp_data))
+//      {
+//        ESC_StdSci_Send(i,temp_data);
+//      }
+//    }
+
+    TIM_SetCompare1(TIM2,Get_d_Cap()*ARR_PWM_DAC/ARR_PWM_CAP);
+    TIM_SetCompare3(TIM2,Get_Hall()*ARR_PWM_DAC/7);
+    TIM_SetCompare4(TIM2,j);		
+
+    if(++j>5999) j = 1999;
+
+    ESC_StdSci_Send(CMD_MotorEnable, motor_ptr->motor_enable_cmd);  //0x01
+    ESC_StdSci_Send(CMD_RefSpeed);                                  //0x02
+    ESC_StdSci_Send(CMD_RefDuty);                                   //0x03
+    ESC_StdSci_Send(CMD_RefCurrent);                                //0x04
+                                                                    
+    ESC_StdSci_Send(Config_SpeedPid_Ki                              //0x10
+    ESC_StdSci_Send(Config_SpeedPid_Kp                              //0x11		
+		
+		
+    ESC_StdSci_Send(State_MainStateMachine, main_machine_state);        //0x80
+    ESC_StdSci_Send(State_ControlStateMachine, control_machine_state);  //0x81
+
+    ESC_StdSci_Send(FeedBack_AppStatus, motor_ptr->app_status);              //0x90
+    ESC_StdSci_Send(FeedBack_iBus, 0x91);                                    //0x91
+    ESC_StdSci_Send(FeedBack_PwmDuty, motor_ptr->temp_pwm_duty);             //0x98
+    ESC_StdSci_Send(FeedBack_AverageSpeed, motor_ptr->average_speed);        //0xA0
+    ESC_StdSci_Send(FeedBack_MeasuredSpeed, motor_ptr->app_measured_speed);  //0xA1
+
+  }/*while(1)*/
+}
+
+//void SysTick_Handler(void)
+//{
+//  u16 i;
+//	i++;
+//}
+
+#ifdef  USE_FULL_ASSERT
+
+/**
+  * @brief  Reports the name of the source file and the source line number
+  *         where the assert_param error has occurred.
+  * @param  file: pointer to the source file name
+  * @param  line: assert_param error line source number
+  * @retval None
+  */
+void assert_failed(uint8_t* file, uint32_t line)
+{ 
+  /* User can add his own implementation to report the file name and line number,
+     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+
+  /* Infinite loop */
+  while (1)
+  {
+  }
+}
+#endif
+
+/**
+  * @}
+  */
+
+/************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/

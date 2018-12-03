@@ -1,0 +1,22 @@
+--cpu Cortex-M3
+".\objects\core_cm3.o"
+".\objects\system_stm32f10x.o"
+".\objects\startup_stm32f10x_md.o"
+".\objects\main.o"
+".\objects\stm32f10x_it.o"
+".\objects\sys.o"
+".\objects\delay.o"
+".\objects\usart.o"
+".\objects\flash.o"
+".\objects\esc_standardsci_protocal.o"
+".\objects\stm32f10x_rcc.o"
+".\objects\stm32f10x_flash.o"
+".\objects\misc.o"
+".\objects\stm32f10x_gpio.o"
+".\objects\stm32f10x_usart.o"
+".\objects\esc_standardsci_receive.o"
+".\objects\esc_standardsci_send.o"
+--strict --scatter ".\Objects\TARGET001.sct"
+--summary_stderr --info summarysizes --map --xref --callgraph --symbols
+--info sizes --info totals --info unused --info veneers
+--list ".\Listings\TARGET001.map" -o .\Objects\TARGET001.axf

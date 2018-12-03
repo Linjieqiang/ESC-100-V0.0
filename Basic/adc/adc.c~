@@ -1,0 +1,52 @@
+// -----------------------------------------------------------
+// FILE: adc.c
+//
+// Description: ...
+//
+// -----------------------------------------------------------
+// Release Date: 2018-11-06;
+// Authour: Steven Liu;
+// -----------------------------------------------------------
+//
+// 1st.macros
+// -----------------------------------------------------------
+   # include "adc.h"
+
+//
+// 2nd. variables
+// -----------------------------------------------------------
+
+//
+// 3rd.function prototypes
+// -----------------------------------------------------------
+
+//
+// 4th.funcions
+// -----------------------------------------------------------
+// 1.function 1
+// ...........................................................
+   /**
+   @brief This is the discription of function 1.
+   @param argument1: This is the discription of argument 1.
+   @param argument2: This is the discription of argument 2.
+   @param argument3: This is the discription of argument 3.
+   @retval This is the discription of the return value.
+   */
+   /*write function 1 here*/
+ 
+// 2.function 2
+// ...........................................................
+   /**
+   @brief This is the discription of function 1.
+   @param argument1: This is the discription of argument 1.
+   @param argument2: This is the discription of argument 2.
+   @param argument3: This is the discription of argument 3.
+   @retval This is the discription of the return value.
+   */
+   /*write function 2 here*/
+
+// ...
+
+// no more.
+// -----------------------------------------------------------
+
