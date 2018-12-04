@@ -3,7 +3,7 @@
 <title>Static Call Graph - [.\Objects\DEMO_STM32F303CC.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image .\Objects\DEMO_STM32F303CC.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050169: Last Updated: Fri Nov 30 15:41:52 2018
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5050169: Last Updated: Tue Dec 04 19:20:32 2018
 <BR><P>
 <H3>Maximum Stack Usage =        192 bytes + Unknown(Functions without stacksize, Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -729,7 +729,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[b8]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;control_state_machine
 </UL>
 
-<P><STRONG><a name="[8b]"></a>ESC_Observer_Hall</STRONG> (Thumb, 1782 bytes, Stack size 32 bytes, esc_bldcm_hall.o(i.ESC_Observer_Hall))
+<P><STRONG><a name="[8b]"></a>ESC_Observer_Hall</STRONG> (Thumb, 2008 bytes, Stack size 32 bytes, esc_bldcm_hall.o(i.ESC_Observer_Hall))
 <BR><BR>[Stack]<UL><LI>Max Depth = 32<LI>Call Chain = ESC_Observer_Hall
 </UL>
 <BR>[Calls]<UL><LI><a href="#[8d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;DMA_GetFlagStatus
@@ -971,6 +971,7 @@ Global Symbols
 
 <P><STRONG><a name="[8f]"></a>SET_STDSCI_PACK_32_TX_OVERRUN</STRONG> (Thumb, 70 bytes, Stack size 0 bytes, esc_standardsci_protocal.o(i.SET_STDSCI_PACK_32_TX_OVERRUN))
 <BR><BR>[Called By]<UL><LI><a href="#[8b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESC_Observer_Hall
+<LI><a href="#[b0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main_state_machine
 </UL>
 
 <P><STRONG><a name="[b2]"></a>SET_STDSCI_PACK_32_TX_OVERRUN_INTERVAL</STRONG> (Thumb, 116 bytes, Stack size 12 bytes, esc_standardsci_protocal.o(i.SET_STDSCI_PACK_32_TX_OVERRUN_INTERVAL))
@@ -1413,7 +1414,7 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[5b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;__rt_entry_main
 </UL>
 
-<P><STRONG><a name="[b0]"></a>main_state_machine</STRONG> (Thumb, 384 bytes, Stack size 24 bytes, esc_statemachine_main.o(i.main_state_machine))
+<P><STRONG><a name="[b0]"></a>main_state_machine</STRONG> (Thumb, 398 bytes, Stack size 24 bytes, esc_statemachine_main.o(i.main_state_machine))
 <BR><BR>[Stack]<UL><LI>Max Depth = 56<LI>Call Chain = main_state_machine &rArr; motor_stop_state_reset &rArr; pwm_disable
 </UL>
 <BR>[Calls]<UL><LI><a href="#[90]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESC_PWM_Cntr_Init
@@ -1422,6 +1423,7 @@ Global Symbols
 <LI><a href="#[df]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESC_SPEED_PID_Reset
 <LI><a href="#[e0]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ESC_SPEED_PID
 <LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SET_STDSCI_PACK_TX_OVERRUN
+<LI><a href="#[8f]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SET_STDSCI_PACK_32_TX_OVERRUN
 </UL>
 <BR>[Called By]<UL><LI><a href="#[b]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;SysTick_Handler
 </UL>

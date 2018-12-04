@@ -156,18 +156,21 @@ void main_state_machine(void)
 
 //      feedback_Test1 = 0;
 
-        if(hall_ptr->dt_commutate_m_average>0x9CF28E)//motor speed < 5rpm //motor_ptr->motorspeed > 0x217B6DB)  
-				{
-					pwm_disable();
+//      if(hall_ptr->dt_commutate_m_average>0x9CF28E)//motor speed < 5rpm //motor_ptr->motorspeed > 0x217B6DB)
+//      if(hall_ptr->dt_commutate_m_average>0xA108587) // <0.3rpm
+        if(hall_ptr->dt_commutate_m_average>0xF53B049) // <0.2rpm
+        {
+          pwm_disable();
           control_machine_state = STATE_CONTROL_IDLE;
           main_machine_state = STATE_MAIN_FAULT;
-					motor_ptr->app_status |= status_starup_fail;
+          motor_ptr->app_status |= status_starup_fail;
+//          SET_STDSCI_PACK_32_TX_OVERRUN(&(btx_ptr->pck_0xA4), &(btx_ptr->pck_0xA5), hall_ptr->dt_commutate_m_average);
 //					feedback_Test1 = 0x5555;
-				}
-				else
-				{
-					if(motor_ptr->control_mode_select_number == 0)
-					{
+        }
+        else
+        {
+          if(motor_ptr->control_mode_select_number == 0)
+          {
 	//					motor_ptr->motor_close_loop_speed_temp = motor_ptr->motor_close_loop_speed;
 	//					motor_ptr->app_speed_command = HertzToTicks(motor_ptr->motor_close_loop_speed_temp, TIMER_D_FREQ_F16) ;
 	//					motor_ptr->app_speed_ref = motor_ptr->app_speed_command;

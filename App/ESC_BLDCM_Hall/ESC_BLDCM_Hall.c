@@ -829,7 +829,7 @@ uint32_t debug_Array_1[8] = {9,9,9,9,9,9,9,9};
 //
      hall_ptr->t_base_temp = TIM_GetCounter(TIM2);
 
-     if (0)//(hall_ptr->observer_state == STATE_HALL_OBSERVER_HS)
+     if (hall_ptr->observer_state == STATE_HALL_OBSERVER_HS)
      {
        switch(hall_ptr->sensored_current_state)
        {
@@ -895,7 +895,7 @@ uint32_t debug_Array_1[8] = {9,9,9,9,9,9,9,9};
      }
 //
 //   hall state varification
-     if (0)//(hall_ptr->observer_state == STATE_HALL_OBSERVER_HS)
+     if (hall_ptr->observer_state == STATE_HALL_OBSERVER_HS)
      {
        if BOOLE_HALL_STATE_CHANGE
        {
