@@ -46,7 +46,7 @@
 // UBus   |50V   |75V   |100V  |
 // Value  |16    |8     |4     |
 // # define PWM_Control_Duty_StartUp 8
-# define PWM_Control_Duty_StartUp 8
+# define PWM_Control_Duty_StartUp 16
 
 //
 // 2nd.datatypes
